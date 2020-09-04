@@ -2,7 +2,7 @@
 title: About
 layout: page
 ---
-![Profile Image]({% if site.external-image %}{{ site.picture }}{% else %}{{ site.url }}/{{ site.picture }}{% endif %})
+<img style=" border-radius: 100%; width: 40%; " alt="{{ site.name }}" src="{% if site.external-image %}{{ site.picture }}{% else %}{{ site.url }}/{{ site.picture }}{% endif %}" />
 
 <p>Hey! Thanks for taking a look at my website! I am a recent Mathematics graduate from the University of Warwick, currently on a year out of higher education due to the COVID-19 pandemic. My major academic interests lie in statistical inference, machine learning and other areas of statistics/applied maths, leading me to look for MSc programmes in Mathematical Sciences/Statistics/Machine Learning for the 2021/22 academic year. As an aspiring machine learner, I will be using this blog to talk about my personal projects, subtleties/unintuitive concepts in various stats/ML/DL topics & packages and anything else interesting that I've read about in my own time!</p>
 
