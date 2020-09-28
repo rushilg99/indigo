@@ -98,7 +98,7 @@ Simply summing the offset and `text{"stride"}[0]*i + \text{"stride"}[1]*j$` give
 
 Here's a really useful picture from "Deep Learning with PyTorch" by Eli Stevens, Luca Antiga and Thomas Viehmann that summarises the shape, stride and offset of a tensor.
 
-![][https://github.com/rushilg99/rushilg99.github.io/tree/gh-pages/_posts/PyTorch_Tensors/metadatasummary.jpg "Summary of tensor metadata"]
+![](https://github.com/rushilg99/rushilg99.github.io/tree/gh-pages/_posts/PyTorch_Tensors/metadatasummary.jpg "Summary of tensor metadata")
 
 ## Broadcasting
 
@@ -161,7 +161,7 @@ torch.Size([3])
 
 Comparing the shapes of the two tensors elementwise tells us that the two tensors are now compatible for addition; the resulting tensor will have shape (4,3). The following image from moodayday's Medium article on broadcasting is very helpful in visualising what goes on.
 
-![Markdowm Image][https://github.com/rushilg99/rushilg99.github.io/tree/gh-pages/_posts/PyTorch_Tensors/broadcasting.gif]
+![Markdowm Image](https://github.com/rushilg99/rushilg99.github.io/tree/gh-pages/_posts/PyTorch_Tensors/broadcasting.gif)
 
 Finally, let's compare outputs with PyTorch!
 
