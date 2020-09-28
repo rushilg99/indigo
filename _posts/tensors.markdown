@@ -1,0 +1,180 @@
+---
+title: "PyTorch Tensors"
+layout: post
+date: 2020-09-28 01:28
+tag:
+- PyTorch
+- Deep Learning
+category: blog
+author: rushilg99
+description: Summary of PyTorch Tensors
+---
+
+## Comparisons with NumPy
+
+Any experienced Python programmer will tell you that NumPy is the "langua franca" for data science and scientific computing in Python. It is so popular that even favoured libraries such as SciPy and Pandas are built on top of it! 
+
+Perhaps the most important feature of the NumPy module is its array. But why use it? Don't we have lists in Python? You're right, we do. But there are a few major problems with these:
+
+1. Standard Python numeric types aren't great if we need to store a large amount of numbers. For instance, we only need 16 bits in memory to represent a 16 bit float but Python embeds it in a Python object instead. When we're dealing with big data, the cost in time by using Python lists as opposed to NumPy arrays adds up.
+2. Python lists are designed to hold arbitary objects. Therefore, operations on vectors such as the scalar and cross products aren't defined for Python lists. In contrast NumPy arrays are homogeneous, allowing for such operations as well as more ease in performing certain ones elementwise.
+
+As great as NumPy is, its array does have disadvantages. For someone interested in Deep Learning and training neural networks, the lack of support for GPU acceleration isn't particularly thrilling. Thankfully, both PyTorch (developed by FAIR) and TensorFlow (developed by Google) offer similar constructs (called tensors) that do support GPU acceleration with CUDA. Moreover, both libraries have functions enabling the conversion between their respective tensors and NumPy arrays, making PyTorch and TensorFlow compatible with SciPy, Scikit-Learn and Pandas (amongst many). 
+
+I am more knowledgeable in PyTorch, so in this blog post I'll focus on the PyTorch tensor, although I'm sure that there are similarities with the equivalent data structure in TensorFlow.
+
+## Memory Storage
+
+PyTorch tensors get around the slowness of Python lists by storing their contents in contiguous chunks of memory. We can see exactly how each element of the tensor is stored by accessing its "storage", which is essentially a flattened version of its respective tensor into a single dimension! Very helpfully, PyTorch provides a method on tensors called storage() (surprise surprise) to access it:
+
+```python
+>>> import torch
+>>> a = torch.tensor([1,2,3])
+>>> a.storage()
+1
+2
+3
+[torch.LongStorage of size 3] 
+```
+
+It follows by the definition of a tensor's storage that changing an element of the storage changes the tensor. But be careful! Tensors can share the same storage. This means that changing an element of one of two such tensors changes their shared storage, which in turn affects the other tensor:
+
+```python
+>>> import torch
+>>> a = torch.tensor([1,2,3])
+>>> b = a
+>>> a
+tensor([1,2,3])
+>>> b 
+tensor([1,2,3])
+>>> b[0] = 0
+>>> b 
+tensor([0,2,3])
+>>> a 
+tensor([0,2,3])
+```
+
+## Indexing PyTorch tensors
+
+The storage instance reflects how the tensor is stored in memory. But how do we index it? It turns out that PyTorch tensors are uniquely defined by their storage together with 3 pieces of metadata - stride, offset and shape. 
+
+1. The shape is exacty what one might presume it to be. It simply describes the number of dimensions of the tensor as well as the number of components in each dimension. For instance, a matrix with 3 rows and 2 columns that's represented as a PyTorch tensor has shape (3,2):
+
+```python
+>>> import torch
+>>> matrix = torch.tensor([[1,2],[3,4],[5,6]],dtype=torch.short)
+>>> matrix
+tensor([[1, 2],
+	    [3, 4],
+	    [5, 6]], dtype=torch.int16)
+>>> matrix.shape
+torch.Size([3, 2])
+```
+
+2. Clearly we aren't able to index a tensor knowing only its storage and shape. Since the storage is one dimensional, we need to know how many steps we need to take in storage to get to the next element in each dimension. Consider the following matrix:
+
+```python
+>>> matrix = torch.tensor([[1,2,3],[4,5,6]],dtype=torch.short)
+>>> matrix
+tensor([[1, 2, 3],
+	    [4, 5, 6]], dtype=torch.int16)
+>>> matrix.storage()
+1
+2
+3
+4
+5
+6
+[torch.ShortStorage of size 6]
+>>> matrix.stride()
+(3, 1)
+```
+
+For each entry in the tensor, we can see that we need to move 3 spaces forward to access the entry in the next row and one space forward to access the entry in the next column. In light of this, the "stride" is (3,1); this is a vector that tells us how to walk through the storage to access the next entry in each dimension (in this case, each row and column). 
+
+3. So we're almost done! At this point, if the first element of the storage corresponds to the "upper left" element of the tensor, finding the (i,j)th index of a tensor corresponds to extracting the (`text{"stride"}[0]*i + \text{"stride"}[1]*j$`)th element in the storage. The last metadatum takes care of situations where the first element of the storage doesn't correspond with the first tensor entry. The "offset" is the index in storage corresponding to the first element in the tensor!
+
+Simply summing the offset and `text{"stride"}[0]*i + \text{"stride"}[1]*j$` gives the (i,j)th entry in the tensor. 
+
+Here's a really useful picture from "Deep Learning with PyTorch" by Eli Stevens, Luca Antiga and Thomas Viehmann that summarises the shape, stride and offset of a tensor.
+
+![][https://github.com/rushilg99/rushilg99.github.io/tree/gh-pages/_posts/PyTorch_Tensors/metadatasummary.jpg "Summary of tensor metadata"]
+
+## Broadcasting
+
+Whilst Python lists are versatile in terms of what they can store, recall that this can also be a problem! It means that certain (useful) mathematical operations aren't defined on these data structures. Since PyTorch tensors and NumPy arrays only allow for items of the same data type in the same tensor/array respectively, this isn't a problem; in fact, PyTorch is quite similar to NumPy regarding support for various mathematical operations on tensors/arrays.
+
+I'd quite like to focus on the notion of broadcasting, used in both packages, because I found it highly unintuitive when dealing with high dimensional arrays and tensors. However, it is much easier to consider this technique with respect to matricies and vectors; we can generalise later!
+
+Consider a 2x2 matrix `$\begin{bmatrix}1 & 2\\3 & 4\end{bmatrix}$` and a 1x2 vector `$\begin{bmatrix}5 & 6\end{bmatrix}$`. Clearly the dimensions don't match up so we can't multiply the two together! Let's have a look at what PyTorch does when we attempt to multiply them together.
+
+```python
+>>> import torch 
+>>> matrix = torch.tensor([[1,2],[3,4]])
+>>> vector = torch.tensor([5,6])
+>>> matrix 
+tensor([[1, 2],
+	    [3, 4]])
+>>> vector 
+tensor([5, 6])
+>>> matrix * vector
+tensor([[5, 12],
+        [15, 24]])
+```
+
+So what has gone on here? Well, the 1x2 vector has been "stretched" to form a 2x2 matrix `$\begin{bmatrix}5 & 6\\5 & 6\end{bmatrix}$` and the elementwise product of `$\begin{bmatrix}1 & 2\\3 & 4\end{bmatrix}$` and `$\begin{bmatrix}5 & 6\\5 & 6\end{bmatrix}$` has been returned. 
+
+This is broadcasting - loosely speaking, the "smaller" tensor is stretched so that its shape is compatible with the "larger" tensor. But what do "smaller" and "larger" mean? When can broadcast a tensor onto another?
+
+When we wish to apply an operation to 2 tensors, PyTorch compares their shapes elementwise. On paper, imagine writing down the shape of the tensor with the most dimensions and write down the shape of the second tensor underneath, making sure that the columns are lined up. Going from right to left, we say that two dimensions are compatible if:
+
+1. one of them is 1
+2. they are equal
+
+The resulting tensor (post the operation) has shape equal to taking the largest size along each dimension of the input arrays. 
+
+## A final example
+
+Suppose we want to add together `$\begin{bmatrix}0\\10\\20\\30\end{bmatrix}$` and `$\begin{bmatrix}0 & 1 & 2\end{bmatrix}$`. 
+
+Firstly, are these tensors compatible? Let's see what PyTorch thinks.
+
+```python
+>>> import torch 
+>>> cvector = torch.tensor([0,10,20,30])
+>>> rvector = torch.tensor([0,1,2])
+>>> cvector.shape 
+torch.Size([4])
+>>> rvector.shape 
+torch.Size([3])
+```
+
+Evidently `$4 \neq 3$`! So multiplying the two tensors together should (and does) yield a runtime error. However, I haven't been particularly faithful to the problem at hand. The tensor "cvector" is a column vector, not a row vector (as implemented). Now...
+
+```python
+>>> cvector = cvector.unsqueeze(-1)
+>>> cvector.shape
+torch.Size([4, 1])
+>>> rvector.shape 
+torch.Size([3])
+```
+
+Comparing the shapes of the two tensors elementwise tells us that the two tensors are now compatible for addition; the resulting tensor will have shape (4,3). The following image from moodayday's Medium article on broadcasting is very helpful in visualising what goes on.
+
+![Markdowm Image][https://github.com/rushilg99/rushilg99.github.io/tree/gh-pages/_posts/PyTorch_Tensors/broadcasting.gif]
+
+Finally, let's compare outputs with PyTorch!
+
+```python
+>>> cvector + rvector 
+tensor([[ 0,  1,  2],
+		[10, 11, 12],
+		[20, 21, 22],
+		[30, 31, 32]])
+```
+
+Hooray! 
+
+## Conclusion
+
+This is my first blog post and the only thing that I can say is that I hope whoever has read this has come out knowing more about PyTorch tensors than what they did prior to reading it! Feel free to play around with them and let me know about anything you discover/want to ask about in the comments!
