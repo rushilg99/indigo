@@ -106,7 +106,7 @@ Whilst Python lists are versatile in terms of what they can store, recall that t
 
 I'd quite like to focus on the notion of broadcasting, used in both packages, because I found it highly unintuitive when dealing with high dimensional arrays and tensors. However, it is much easier to consider this technique with respect to matricies and vectors; we can generalise later!
 
-Consider a 2x2 matrix \\( \begin{bmatrix}1 & 2\\3 & 4\end{bmatrix} \\) and a 1x2 vector `$\begin{bmatrix}5 & 6\end{bmatrix}$`. Clearly the dimensions don't match up so we can't multiply the two together! Let's have a look at what PyTorch does when we attempt to multiply them together.
+Consider a 2x2 matrix \\( \begin{pmatrix}1 & 2\\\3 & 4\end{pmatrix} \\) and a 1x2 vector `$\begin{bmatrix}5 & 6\end{bmatrix}$`. Clearly the dimensions don't match up so we can't multiply the two together! Let's have a look at what PyTorch does when we attempt to multiply them together.
 
 ```python
 >>> import torch 
