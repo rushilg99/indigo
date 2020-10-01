@@ -12,7 +12,7 @@ description: Summary of PyTorch Tensors
 
 ## Comparisons with NumPy
 
-Any experienced Python programmer will tell you that NumPy is the "langua franca" for data science and scientific computing in Python. It is so popular that even favoured libraries such as SciPy and Pandas are built on top of it! 
+Any experienced Python programmer will tell you that NumPy is the "langua franca" for data science and scientific computing in Python. It is so popular that favoured libraries such as SciPy and Pandas are built on top of it. 
 
 Perhaps the most important feature of the NumPy module is its array. But why use it? Don't we have lists in Python? You're right, we do. But there are a few major problems with these:
 
@@ -21,7 +21,7 @@ Perhaps the most important feature of the NumPy module is its array. But why use
 
 As great as NumPy is, its array does have disadvantages. For someone interested in Deep Learning and training neural networks, the lack of support for GPU acceleration isn't particularly thrilling. Thankfully, both PyTorch (developed by FAIR) and TensorFlow (developed by Google) offer similar constructs (called tensors) that do support GPU acceleration with CUDA. Moreover, both libraries have functions enabling the conversion between their respective tensors and NumPy arrays, making PyTorch and TensorFlow compatible with SciPy, Scikit-Learn and Pandas (amongst many). 
 
-I am more knowledgeable in PyTorch, so in this blog post I'll focus on the PyTorch tensor, although I'm sure that there are similarities with the equivalent data structure in TensorFlow.
+I am more familiar with PyTorch, so in this blog post I'll focus on the PyTorch tensor, although I'm sure that there are similarities with the equivalent data structure in TensorFlow.
 
 ## Memory Storage
 
@@ -59,7 +59,6 @@ tensor([0,2,3])
 The storage instance reflects how the tensor is stored in memory. But how do we index it? It turns out that PyTorch tensors are uniquely defined by their storage together with 3 pieces of metadata - stride, offset and shape. 
 
 1. The shape is exactly what one might presume it to be. It simply describes the number of dimensions of the tensor as well as the number of components in each dimension. For instance, a matrix with 3 rows and 2 columns that's represented as a PyTorch tensor has shape (3,2):
-
 ```python
 >>> import torch
 >>> matrix = torch.tensor([[1,2],[3,4],[5,6]],dtype=torch.short)
@@ -70,9 +69,7 @@ tensor([[1, 2],
 >>> matrix.shape
 torch.Size([3, 2])
 ```
-
 2. Clearly we aren't able to index a tensor knowing only its storage and shape. Since the storage is one dimensional, we need to know how many steps we need to take in storage to get to the next element in each dimension. Consider the following matrix:
-
 ```python
 >>> matrix = torch.tensor([[1,2,3],[4,5,6]],dtype=torch.short)
 >>> matrix
@@ -89,10 +86,9 @@ tensor([[1, 2, 3],
 >>> matrix.stride()
 (3, 1)
 ```
-
 For each entry in the tensor, we can see that we need to move 3 spaces forward to access the entry in the next row and one space forward to access the entry in the next column. In light of this, the "stride" is (3,1); this is a vector that tells us how to walk through the storage to access the next entry in each dimension (in this case, each row and column). 
 
-3. So we're almost done! At this point, if the first element of the storage corresponds to the "upper left" element of the tensor, finding the (i,j)th index of a tensor corresponds to extracting the (\\( \text{stride}[0]*i + \text{stride}[1]*j) \\)th element in the storage. The last metadatum takes care of situations where the first element of the storage doesn't correspond with the first tensor entry. The "offset" is the index in storage corresponding to the first element in the tensor!
+3. So we're almost done! At this point, if the first element of the storage corresponds to the "upper left" element of the tensor, finding the (i,j)th index of a tensor corresponds to extracting the ( \\( \text{stride}[0]*i + \text{stride}[1]*j) \\) th element in the storage. The last metadatum takes care of situations where the first element of the storage doesn't correspond with the first tensor entry. The "offset" is the index in storage corresponding to the first element in the tensor!
 
 Simply summing the offset and \\( \text{stride}[0]*i + \text{stride}[1]*j \\) gives the (i,j)th entry in the tensor. 
 
@@ -122,7 +118,7 @@ tensor([[5, 12],
         [15, 24]])
 ```
 
-So what has gone on here? Well, the 1x2 vector has been "stretched" to form a 2x2 matrix \\( \begin{pmatrix}5 & 6\\5 & 6\end{pmatrix} \\) and the elementwise product of \\( \begin{pmatrix}1 & 2\\\3 & 4\end{pmatrix} \\) and \\( \begin{pmatrix}5 & 6\\\5 & 6\end{pmatrix} \\) has been returned. 
+So what has gone on here? Well, the 1x2 vector has been "stretched" to form a 2x2 matrix \\( \begin{pmatrix}5 & 6\\\5 & 6\end{pmatrix} \\) and the elementwise product of \\( \begin{pmatrix}1 & 2\\\3 & 4\end{pmatrix} \\) and \\( \begin{pmatrix}5 & 6\\\5 & 6\end{pmatrix} \\) has been returned. 
 
 This is broadcasting - loosely speaking, the "smaller" tensor is stretched so that its shape is compatible with the "larger" tensor. But what do "smaller" and "larger" mean? When can broadcast a tensor onto another?
 
