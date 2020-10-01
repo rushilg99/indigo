@@ -88,9 +88,9 @@ tensor([[1, 2, 3],
 ```
 For each entry in the tensor, we can see that we need to move 3 spaces forward to access the entry in the next row and one space forward to access the entry in the next column. In light of this, the "stride" is (3,1); this is a vector that tells us how to walk through the storage to access the next entry in each dimension (in this case, each row and column). 
 
-3. So we're almost done! At this point, if the first element of the storage corresponds to the "upper left" element of the tensor, finding the (i,j)th index of a tensor corresponds to extracting the ( \\( \text{stride}[0]*i + \text{stride}[1]*j) \\) th element in the storage. The last metadatum takes care of situations where the first element of the storage doesn't correspond with the first tensor entry. The "offset" is the index in storage corresponding to the first element in the tensor!
+3. So we're almost done! At this point, if the first element of the storage corresponds to the "upper left" element of the tensor, finding the (i,j)th index of a tensor corresponds to extracting the ( \\( stride[0]*i + stride[1]*j) \\) th element in the storage. The last metadatum takes care of situations where the first element of the storage doesn't correspond with the first tensor entry. The "offset" is the index in storage corresponding to the first element in the tensor!
 
-Simply summing the offset and \\( \text{stride}[0]*i + \text{stride}[1]*j \\) gives the (i,j)th entry in the tensor. 
+Simply summing the offset and \\( stride[0]*i + stride[1]*j \\) gives the (i,j)th entry in the tensor. 
 
 Here's a really useful picture from "Deep Learning with PyTorch" by Eli Stevens, Luca Antiga and Thomas Viehmann that summarises the shape, stride and offset of a tensor.
 
