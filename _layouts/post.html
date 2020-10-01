@@ -8,6 +8,9 @@ layout: page
 
 <h1 class="title">{{ page.title }}</h1>
 
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+
 <span class="date">
     <time datetime="{{ page.date | date:"%d-%m-%Y" }}">{{ page.date | date: "%A. %B %d, %Y" }}</time>
     {% if site.read-time %} - {% include read-time.html %}{% endif %}
